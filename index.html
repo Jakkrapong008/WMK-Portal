@@ -261,17 +261,60 @@
                 });
         };
 
+        // ฟังก์ชันช่วยกำหนดสีตามหมวดหมู่ (แก้ไขให้ข้อความมีสีที่แตกต่างกัน)
+        function getCategoryColors(categoryName) {
+            const name = categoryName ? categoryName.replace(/,/g, '').trim() : ''; // ตัดเครื่องหมายจุลภาคเผื่อพิมพ์ผิด
+            
+            // ฝ่ายบริหารงานวิชาการ (สีฟ้า)
+            if (name.includes('วิชาการ')) return { 
+                badgeBg: 'bg-blue-100', badgeText: 'text-blue-800', 
+                btnActive: 'bg-blue-600 text-white border-blue-600 shadow-md transform scale-105', 
+                btnInactive: 'bg-white text-blue-700 border-gray-200 hover:border-blue-400 hover:bg-blue-50' 
+            };
+            // ฝ่ายบริหารงานทั่วไป (สีม่วง)
+            if (name.includes('ทั่วไป') && name.includes('บริหาร')) return { 
+                badgeBg: 'bg-purple-100', badgeText: 'text-purple-800', 
+                btnActive: 'bg-purple-600 text-white border-purple-600 shadow-md transform scale-105', 
+                btnInactive: 'bg-white text-purple-700 border-gray-200 hover:border-purple-400 hover:bg-purple-50' 
+            };
+            // ฝ่ายบริหารงานบุคคล (สีชมพู/แดงอมม่วง)
+            if (name.includes('บุคคล')) return { 
+                badgeBg: 'bg-pink-100', badgeText: 'text-pink-800', 
+                btnActive: 'bg-pink-600 text-white border-pink-600 shadow-md transform scale-105', 
+                btnInactive: 'bg-white text-pink-700 border-gray-200 hover:border-pink-400 hover:bg-pink-50' 
+            };
+            // ฝ่ายบริหารงานแผนและงบประมาณ (สีเขียว)
+            if (name.includes('แผน') || name.includes('งบประมาณ')) return { 
+                badgeBg: 'bg-emerald-100', badgeText: 'text-emerald-800', 
+                btnActive: 'bg-emerald-600 text-white border-emerald-600 shadow-md transform scale-105', 
+                btnInactive: 'bg-white text-emerald-700 border-gray-200 hover:border-emerald-400 hover:bg-emerald-50' 
+            };
+            // การใช้งานทั่วไป (สีเทาฟ้า)
+            if (name === 'การใช้งานทั่วไป') return { 
+                badgeBg: 'bg-slate-100', badgeText: 'text-slate-800', 
+                btnActive: 'bg-slate-600 text-white border-slate-600 shadow-md transform scale-105', 
+                btnInactive: 'bg-white text-slate-700 border-gray-200 hover:border-slate-400 hover:bg-slate-50' 
+            };
+            
+            // สีเริ่มต้น (สำหรับหมวดหมู่อื่นๆ หรือ "ทั้งหมด")
+            return { 
+                badgeBg: 'bg-yellow-100', badgeText: 'text-yellow-800', 
+                btnActive: 'bg-red-600 text-white border-red-600 shadow-md transform scale-105', 
+                btnInactive: 'bg-white text-gray-700 border-gray-200 hover:border-yellow-400 hover:bg-yellow-50 hover:text-red-700' 
+            };
+        }
+
         function renderCategories() {
             categoryContainer.innerHTML = '';
             categories.forEach(category => {
                 const btn = document.createElement('button');
                 btn.textContent = category || 'ไม่มีหมวดหมู่';
                 
+                const colors = getCategoryColors(category);
                 const baseClasses = "px-5 py-2.5 rounded-full text-sm md:text-base font-semibold transition-all duration-300 shadow-sm border";
-                const activeClasses = "bg-red-600 text-white border-red-600 shadow-md transform scale-105";
-                const inactiveClasses = "bg-white text-gray-700 border-gray-200 hover:border-yellow-400 hover:bg-yellow-50 hover:text-red-700";
                 
-                btn.className = `${baseClasses} ${activeCategory === category ? activeClasses : inactiveClasses}`;
+                // นำสีมาใช้กับปุ่ม
+                btn.className = `${baseClasses} ${activeCategory === category ? colors.btnActive : colors.btnInactive}`;
                 
                 btn.onclick = () => {
                     activeCategory = category;
@@ -306,12 +349,22 @@
                 filteredApps.forEach(app => {
                     const clickCount = parseInt(app['คลิก']) || 0;
                     const safeAppName = app['ชื่อแอป'].replace(/"/g, '&quot;').replace(/'/g, "\\'");
+                    
+                    // ดึงชุดสีตามหมวดหมู่
+                    const colors = getCategoryColors(app['หมวดหมู่']);
 
                     const categoryBadge = app['หมวดหมู่'] 
                         ? `<div class="mb-3">
-                               <span class="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full inline-block shadow-sm">
+                               <span class="px-3 py-1 ${colors.badgeBg} ${colors.badgeText} text-xs font-semibold rounded-full inline-block shadow-sm">
                                    ${app['หมวดหมู่']}
                                </span>
+                           </div>` 
+                        : '';
+
+                    // สร้างส่วนแสดงรูปภาพ (หากมีข้อมูลในคอลัมน์ pic)
+                    const imageHTML = app['pic'] 
+                        ? `<div class="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-gray-50 flex items-center justify-center">
+                               <img src="${app['pic']}" alt="${app['ชื่อแอป']}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onerror="this.style.display='none'">
                            </div>` 
                         : '';
 
@@ -322,11 +375,15 @@
                             <div class="h-2 w-full bg-gradient-to-r from-yellow-400 to-red-500"></div>
                             
                             <div class="p-6 flex-grow flex flex-col">
-                                ${categoryBadge}
-                                
-                                <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-red-600 transition-colors line-clamp-2 leading-tight">
-                                    ${app['ชื่อแอป'] || 'ไม่ระบุชื่อ'}
-                               </h3>
+                                <div class="flex justify-between items-start gap-4 mb-3">
+                                    <div class="flex-1 min-w-0">
+                                        ${categoryBadge}
+                                        <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2 group-hover:text-red-600 transition-colors line-clamp-2 leading-tight">
+                                            ${app['ชื่อแอป'] || 'ไม่ระบุชื่อ'}
+                                        </h3>
+                                    </div>
+                                    ${imageHTML}
+                                </div>
                                 
                                 <p class="text-sm text-gray-500 mb-6 flex-grow line-clamp-3 leading-relaxed">
                                     ${app['คำอธิบาย'] || 'ไม่มีคำอธิบายสำหรับแอปพลิเคชันนี้'}
