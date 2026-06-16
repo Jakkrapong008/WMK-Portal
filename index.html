@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WMK Portal - ศูนย์รวมแอปพลิเคชัน โรงเรียนวัดแม่กะ</title>
     
+    <!-- เพิ่ม Favicon (โลโก้บนแถบบราวเซอร์) -->
+    <link rel="icon" href="https://img2.pic.in.th/logob0b7643db577ceee.png" type="image/png">
+    
     <!-- นำเข้า Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -361,9 +364,9 @@
                            </div>` 
                         : '';
 
-                    // สร้างส่วนแสดงรูปภาพ (หากมีข้อมูลในคอลัมน์ pic) ขยายขนาดให้ใหญ่ขึ้น
+                    // สร้างส่วนแสดงรูปภาพ (หากมีข้อมูลในคอลัมน์ pic) ขยายขนาดให้ใหญ่ขึ้นตามที่กำหนด
                     const imageHTML = app['pic'] 
-                        ? `<div class="w-30 h-30 sm:w-30 sm:h-30 flex-shrink-0 rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-gray-50 flex items-center justify-center">
+                        ? `<div class="w-[120px] h-[120px] sm:w-[120px] sm:h-[120px] flex-shrink-0 rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-gray-50 flex items-center justify-center">
                                <img src="${app['pic']}" alt="${app['ชื่อแอป']}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onerror="this.style.display='none'">
                            </div>` 
                         : '';
