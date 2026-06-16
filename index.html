@@ -1,223 +1,307 @@
-import React, { useState, useEffect } from 'react';
-import { ExternalLink, LayoutGrid, Search, Loader2, AlertCircle } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WMK Portal - ศูนย์รวมแอปพลิเคชัน โรงเรียนวัดแม่กะ</title>
+    
+    <!-- นำเข้า Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- นำเข้า Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- นำเข้าฟอนต์ Sarabun -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+        }
+        /* ซ่อน element เวลาโหลด/ค้นหาไม่เจอ */
+        .hidden {
+            display: none !important;
+        }
+        /* จัดการ line-clamp สำหรับข้อความหลายบรรทัด */
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
+        }
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50 flex flex-col">
 
-export default function App() {
-  const [apps, setApps] = useState([]);
-  const [categories, setCategories] = useState(['ทั้งหมด']);
-  const [activeCategory, setActiveCategory] = useState('ทั้งหมด');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+    <!-- Header Section -->
+    <header class="bg-gradient-to-r from-red-800 via-red-600 to-red-700 shadow-lg relative overflow-hidden">
+        <!-- Background Decoration -->
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-yellow-400 opacity-20 blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-red-900 opacity-30 blur-3xl"></div>
 
-  const API_URL = 'https://script.google.com/macros/s/AKfycbzfsKPZkki8RCDe9jrtIM_rv42uVxijZrdOvNncYR_n-apJsK4Do53Uc9LIq2K3PRrpBA/exec';
-  const LOGO_URL = 'https://img2.pic.in.th/logob0b7643db577ceee.png';
-
-  useEffect(() => {
-    // นำเข้าฟอนต์ Sarabun
-    const link = document.createElement('link');
-    link.href = 'https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap';
-    link.rel = 'stylesheet';
-    document.head.appendChild(link);
-
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(API_URL);
-      if (!response.ok) throw new Error('Network response was not ok');
-      
-      const data = await response.json();
-      
-      // จัดการข้อมูลที่ได้จาก Apps Script (สมมติว่าเป็น Array of Objects)
-      const appData = data.data || data; 
-      
-      // กรองแถวที่ว่างเปล่าออก
-      const validApps = appData.filter(app => app['ชื่อแอป'] && app['Link']);
-      setApps(validApps);
-
-      // ดึงหมวดหมู่ที่ไม่ซ้ำกัน
-      const uniqueCategories = [...new Set(validApps.map(app => app['หมวดหมู่']).filter(Boolean))];
-      setCategories(['ทั้งหมด', ...uniqueCategories]);
-      
-    } catch (err) {
-      console.error('Error fetching data:', err);
-      setError('ไม่สามารถเชื่อมต่อข้อมูลได้ กรุณาลองใหม่อีกครั้ง');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // กรองแอปตามหมวดหมู่และคำค้นหา
-  const filteredApps = apps.filter(app => {
-    const matchCategory = activeCategory === 'ทั้งหมด' || app['หมวดหมู่'] === activeCategory;
-    const searchLower = searchQuery.toLowerCase();
-    const matchSearch = (app['ชื่อแอป']?.toLowerCase().includes(searchLower)) || 
-                        (app['คำอธิบาย']?.toLowerCase().includes(searchLower));
-    return matchCategory && matchSearch;
-  });
-
-  return (
-    <div className="min-h-screen bg-gray-50 flex flex-col" style={{ fontFamily: "'Sarabun', sans-serif" }}>
-      
-      {/* Header Section */}
-      <header className="bg-gradient-to-r from-red-800 via-red-600 to-red-700 shadow-lg relative overflow-hidden">
-        {/* Background Decoration */}
-        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-yellow-400 opacity-20 blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-red-900 opacity-30 blur-3xl"></div>
-
-        <div className="container mx-auto px-4 py-8 relative z-10">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className="bg-white p-2 rounded-2xl shadow-xl transform transition-transform hover:scale-105 duration-300">
-                <img 
-                  src={LOGO_URL} 
-                  alt="WMK Portal Logo" 
-                  className="w-20 h-20 object-contain rounded-xl"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "https://via.placeholder.com/80?text=WMK";
-                  }}
-                />
-              </div>
-              <div className="text-center md:text-left text-white">
-                <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-1 text-transparent bg-clip-text bg-gradient-to-r from-white to-yellow-200">
-                  WMK Portal
-                </h1>
-                <p className="text-red-100 text-sm md:text-base font-medium">
-                  ศูนย์รวมแอปพลิเคชัน โรงเรียนวัดแม่กะ
-                </p>
-              </div>
-            </div>
-
-            {/* Search Box */}
-            <div className="w-full md:w-auto relative group">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-yellow-500 transition-colors">
-                <Search size={20} />
-              </div>
-              <input
-                type="text"
-                className="w-full md:w-80 pl-10 pr-4 py-3 rounded-full border-none shadow-inner bg-white/10 backdrop-blur-md text-white placeholder-red-200 focus:bg-white focus:text-gray-800 focus:ring-4 focus:ring-yellow-400/50 transition-all duration-300 outline-none"
-                placeholder="ค้นหาแอปพลิเคชัน..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="flex-grow container mx-auto px-4 py-8">
-        
-        {/* State: Loading */}
-        {loading && (
-          <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="w-12 h-12 text-red-600 animate-spin mb-4" />
-            <p className="text-gray-600 font-medium animate-pulse">กำลังโหลดข้อมูลระบบ...</p>
-          </div>
-        )}
-
-        {/* State: Error */}
-        {error && !loading && (
-          <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded-r-xl shadow-sm flex items-start gap-4 my-8">
-            <AlertCircle className="text-red-500 w-6 h-6 flex-shrink-0 mt-0.5" />
-            <div>
-              <h3 className="text-red-800 font-semibold text-lg">เกิดข้อผิดพลาด</h3>
-              <p className="text-red-600 mt-1">{error}</p>
-              <button 
-                onClick={fetchData}
-                className="mt-3 px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm font-medium transition-colors"
-              >
-                ลองใหม่อีกครั้ง
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Content */}
-        {!loading && !error && (
-          <>
-            {/* Category Filter */}
-            <div className="mb-10">
-              <div className="flex items-center gap-2 mb-4 text-gray-800">
-                <LayoutGrid size={20} className="text-red-600" />
-                <h2 className="text-xl font-bold">เลือกหมวดหมู่</h2>
-              </div>
-              <div className="flex flex-wrap gap-2 md:gap-3">
-                {categories.map((category, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setActiveCategory(category)}
-                    className={`px-5 py-2.5 rounded-full text-sm md:text-base font-semibold transition-all duration-300 shadow-sm border
-                      ${activeCategory === category 
-                        ? 'bg-red-600 text-white border-red-600 shadow-md transform scale-105' 
-                        : 'bg-white text-gray-700 border-gray-200 hover:border-yellow-400 hover:bg-yellow-50 hover:text-red-700'
-                      }`}
-                  >
-                    {category || 'ไม่มีหมวดหมู่'}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Empty State for Search */}
-            {filteredApps.length === 0 && (
-              <div className="text-center py-20 bg-white rounded-3xl shadow-sm border border-gray-100">
-                <img src="https://illustrations.popsy.co/amber/falling.svg" alt="Not found" className="w-48 mx-auto opacity-50 mb-4" />
-                <h3 className="text-xl font-bold text-gray-800 mb-2">ไม่พบแอปพลิเคชัน</h3>
-                <p className="text-gray-500">ลองค้นหาด้วยคำอื่น หรือเลือกหมวดหมู่ใหม่</p>
-              </div>
-            )}
-
-            {/* Apps Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredApps.map((app, index) => (
-                <a
-                  href={app['Link']}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  key={index}
-                  className="group flex flex-col bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 overflow-hidden"
-                >
-                  {/* Card Top Banner (Color Accent) */}
-                  <div className="h-2 w-full bg-gradient-to-r from-yellow-400 to-red-500"></div>
-                  
-                  <div className="p-6 flex-grow flex flex-col">
-                    {app['หมวดหมู่'] && (
-                      <div className="mb-3">
-                        <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full inline-block shadow-sm">
-                          {app['หมวดหมู่']}
-                        </span>
-                      </div>
-                    )}
-                    
-                    <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-red-600 transition-colors line-clamp-2 leading-tight">
-                      {app['ชื่อแอป'] || 'ไม่ระบุชื่อ'}
-                    </h3>
-                    
-                    <p className="text-sm text-gray-500 mb-6 flex-grow line-clamp-3 leading-relaxed">
-                      {app['คำอธิบาย'] || 'ไม่มีคำอธิบายสำหรับแอปพลิเคชันนี้'}
-                    </p>
-                    
-                    <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-end text-red-600 group-hover:text-red-700">
-                      <ExternalLink size={20} className="transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+        <div class="container mx-auto px-4 py-8 relative z-10">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="bg-white p-2 rounded-2xl shadow-xl transform transition-transform hover:scale-105 duration-300">
+                        <img 
+                            src="https://img2.pic.in.th/logob0b7643db577ceee.png" 
+                            alt="WMK Portal Logo" 
+                            class="w-20 h-20 object-contain rounded-xl"
+                            onerror="this.onerror=null;this.src='https://via.placeholder.com/80?text=WMK';"
+                        />
                     </div>
-                  </div>
-                </a>
-              ))}
-            </div>
-          </>
-        )}
-      </main>
+                    <div class="text-center md:text-left text-white">
+                        <h1 class="text-3xl md:text-4xl font-bold tracking-tight mb-1 text-transparent bg-clip-text bg-gradient-to-r from-white to-yellow-200">
+                            WMK Portal
+                        </h1>
+                        <p class="text-red-100 text-sm md:text-base font-medium">
+                            ศูนย์รวมแอปพลิเคชัน โรงเรียนวัดแม่กะ
+                        </p>
+                    </div>
+                </div>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-6 mt-auto">
-        <div className="container mx-auto px-4 text-center text-sm text-gray-500">
-          <p>© {new Date().getFullYear()} WMK Portal. All rights reserved.</p>
+                <!-- Search Box -->
+                <div class="w-full md:w-auto relative group">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-yellow-500 transition-colors">
+                        <i data-lucide="search" class="w-5 h-5"></i>
+                    </div>
+                    <input
+                        type="text"
+                        id="search-input"
+                        class="w-full md:w-80 pl-10 pr-4 py-3 rounded-full border-none shadow-inner bg-white/10 backdrop-blur-md text-white placeholder-red-200 focus:bg-white focus:text-gray-800 focus:ring-4 focus:ring-yellow-400/50 transition-all duration-300 outline-none"
+                        placeholder="ค้นหาแอปพลิเคชัน..."
+                    />
+                </div>
+            </div>
         </div>
-      </footer>
-    </div>
-  );
-}
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        
+        <!-- State: Loading -->
+        <div id="loading-state" class="flex flex-col items-center justify-center py-20">
+            <i data-lucide="loader-2" class="w-12 h-12 text-red-600 animate-spin mb-4"></i>
+            <p class="text-gray-600 font-medium animate-pulse">กำลังโหลดข้อมูลระบบ...</p>
+        </div>
+
+        <!-- State: Error -->
+        <div id="error-state" class="hidden bg-red-50 border-l-4 border-red-500 p-6 rounded-r-xl shadow-sm flex flex-col sm:flex-row items-start gap-4 my-8">
+            <i data-lucide="alert-circle" class="text-red-500 w-6 h-6 flex-shrink-0 mt-0.5"></i>
+            <div>
+                <h3 class="text-red-800 font-semibold text-lg">เกิดข้อผิดพลาด</h3>
+                <p id="error-message" class="text-red-600 mt-1">ไม่สามารถเชื่อมต่อข้อมูลได้ กรุณาลองใหม่อีกครั้ง</p>
+                <button 
+                    onclick="fetchData()"
+                    class="mt-3 px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm font-medium transition-colors"
+                >
+                    ลองใหม่อีกครั้ง
+                </button>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div id="content-area" class="hidden">
+            <!-- Category Filter -->
+            <div class="mb-10">
+                <div class="flex items-center gap-2 mb-4 text-gray-800">
+                    <i data-lucide="layout-grid" class="w-5 h-5 text-red-600"></i>
+                    <h2 class="text-xl font-bold">เลือกหมวดหมู่</h2>
+                </div>
+                <div id="category-container" class="flex flex-wrap gap-2 md:gap-3">
+                    <!-- ปุ่มหมวดหมู่จะถูกสร้างที่นี่โดย JS -->
+                </div>
+            </div>
+
+            <!-- Empty State for Search -->
+            <div id="empty-state" class="hidden text-center py-20 bg-white rounded-3xl shadow-sm border border-gray-100">
+                <img src="https://illustrations.popsy.co/amber/falling.svg" alt="Not found" class="w-48 mx-auto opacity-50 mb-4" />
+                <h3 class="text-xl font-bold text-gray-800 mb-2">ไม่พบแอปพลิเคชัน</h3>
+                <p class="text-gray-500">ลองค้นหาด้วยคำอื่น หรือเลือกหมวดหมู่ใหม่</p>
+            </div>
+
+            <!-- Apps Grid -->
+            <div id="app-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- การ์ดแอปพลิเคชันจะถูกสร้างที่นี่โดย JS -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 py-6 mt-auto">
+        <div class="container mx-auto px-4 text-center text-sm text-gray-500">
+            <p id="footer-year">© WMK Portal. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Application Logic -->
+    <script>
+        // เริ่มต้นไอคอน Lucide ครั้งแรก
+        lucide.createIcons();
+        document.getElementById('footer-year').innerText = `© ${new Date().getFullYear()} WMK Portal. All rights reserved.`;
+
+        // ตัวแปรข้อมูล
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzfsKPZkki8RCDe9jrtIM_rv42uVxijZrdOvNncYR_n-apJsK4Do53Uc9LIq2K3PRrpBA/exec';
+        let allApps = [];
+        let categories = ['ทั้งหมด'];
+        let activeCategory = 'ทั้งหมด';
+        let searchQuery = '';
+
+        // DOM Elements
+        const loadingState = document.getElementById('loading-state');
+        const errorState = document.getElementById('error-state');
+        const contentArea = document.getElementById('content-area');
+        const errorMessage = document.getElementById('error-message');
+        const categoryContainer = document.getElementById('category-container');
+        const appContainer = document.getElementById('app-container');
+        const emptyState = document.getElementById('empty-state');
+        const searchInput = document.getElementById('search-input');
+
+        // ฟังก์ชันดึงข้อมูลจาก Google Sheets
+        async function fetchData() {
+            showLoading();
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const data = await response.json();
+                const appData = data.data || data;
+                
+                // กรองแถวที่ว่างเปล่าออก
+                allApps = appData.filter(app => app['ชื่อแอป'] && app['Link']);
+
+                // ดึงหมวดหมู่ที่ไม่ซ้ำกัน
+                const uniqueCategories = [...new Set(allApps.map(app => app['หมวดหมู่']).filter(Boolean))];
+                categories = ['ทั้งหมด', ...uniqueCategories];
+                
+                renderCategories();
+                renderApps();
+                showContent();
+            } catch (err) {
+                console.error('Error fetching data:', err);
+                showError('ไม่สามารถเชื่อมต่อข้อมูลได้ กรุณาลองใหม่อีกครั้ง');
+            }
+        }
+
+        // ฟังก์ชันแสดงหมวดหมู่
+        function renderCategories() {
+            categoryContainer.innerHTML = '';
+            categories.forEach(category => {
+                const btn = document.createElement('button');
+                btn.textContent = category || 'ไม่มีหมวดหมู่';
+                
+                // กำหนดสไตล์ปุ่ม (Active / Inactive)
+                const baseClasses = "px-5 py-2.5 rounded-full text-sm md:text-base font-semibold transition-all duration-300 shadow-sm border";
+                const activeClasses = "bg-red-600 text-white border-red-600 shadow-md transform scale-105";
+                const inactiveClasses = "bg-white text-gray-700 border-gray-200 hover:border-yellow-400 hover:bg-yellow-50 hover:text-red-700";
+                
+                btn.className = `${baseClasses} ${activeCategory === category ? activeClasses : inactiveClasses}`;
+                
+                // Event คลิกหมวดหมู่
+                btn.onclick = () => {
+                    activeCategory = category;
+                    renderCategories(); // อัปเดตสีปุ่ม
+                    renderApps();       // กรองข้อมูลใหม่
+                };
+                
+                categoryContainer.appendChild(btn);
+            });
+        }
+
+        // ฟังก์ชันแสดงการ์ดแอปพลิเคชัน
+        function renderApps() {
+            // กรองข้อมูลตามหมวดหมู่และคำค้นหา
+            const filteredApps = allApps.filter(app => {
+                const matchCategory = activeCategory === 'ทั้งหมด' || app['หมวดหมู่'] === activeCategory;
+                const searchLower = searchQuery.toLowerCase();
+                const matchSearch = (app['ชื่อแอป']?.toLowerCase().includes(searchLower)) || 
+                                    (app['คำอธิบาย']?.toLowerCase().includes(searchLower));
+                return matchCategory && matchSearch;
+            });
+
+            appContainer.innerHTML = '';
+
+            if (filteredApps.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                
+                filteredApps.forEach(app => {
+                    // สร้าง HTML สำหรับป้ายหมวดหมู่ (ถ้ามี)
+                    const categoryBadge = app['หมวดหมู่'] 
+                        ? `<div class="mb-3">
+                               <span class="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full inline-block shadow-sm">
+                                   ${app['หมวดหมู่']}
+                               </span>
+                           </div>` 
+                        : '';
+
+                    // สร้าง HTML สำหรับการ์ด
+                    const cardHTML = `
+                        <a href="${app['Link']}" target="_blank" rel="noopener noreferrer" class="group flex flex-col bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 overflow-hidden">
+                            <!-- Card Top Banner (Color Accent) -->
+                            <div class="h-2 w-full bg-gradient-to-r from-yellow-400 to-red-500"></div>
+                            
+                            <div class="p-6 flex-grow flex flex-col">
+                                ${categoryBadge}
+                                
+                                <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-red-600 transition-colors line-clamp-2 leading-tight">
+                                    ${app['ชื่อแอป'] || 'ไม่ระบุชื่อ'}
+                               </h3>
+                                
+                                <p class="text-sm text-gray-500 mb-6 flex-grow line-clamp-3 leading-relaxed">
+                                    ${app['คำอธิบาย'] || 'ไม่มีคำอธิบายสำหรับแอปพลิเคชันนี้'}
+                                </p>
+                                
+                                <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-end text-red-600 group-hover:text-red-700">
+                                    <i data-lucide="external-link" class="w-5 h-5 transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"></i>
+                                </div>
+                            </div>
+                        </a>
+                    `;
+                    
+                    appContainer.insertAdjacentHTML('beforeend', cardHTML);
+                });
+                
+                // โหลดไอคอนใหม่สำหรับการ์ดที่เพิ่งถูกสร้าง
+                lucide.createIcons();
+            }
+        }
+
+        // ระบบค้นหา (Search Event)
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            renderApps();
+        });
+
+        // --- Helper Functions จัดการการแสดงผลหน้าจอ ---
+        function showLoading() {
+            loadingState.classList.remove('hidden');
+            errorState.classList.add('hidden');
+            contentArea.classList.add('hidden');
+        }
+
+        function showError(msg) {
+            errorMessage.textContent = msg;
+            loadingState.classList.add('hidden');
+            errorState.classList.remove('hidden');
+            contentArea.classList.add('hidden');
+        }
+
+        function showContent() {
+            loadingState.classList.add('hidden');
+            errorState.classList.add('hidden');
+            contentArea.classList.remove('hidden');
+        }
+
+        // เริ่มการทำงานครั้งแรก
+        fetchData();
+    </script>
+</body>
+</html>
