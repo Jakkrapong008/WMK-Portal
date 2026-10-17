@@ -5,44 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WMK Portal - ศูนย์รวมแอปพลิเคชัน โรงเรียนวัดแม่กะ</title>
     
-    <!-- เพิ่ม Favicon (โลโก้บนแถบบราวเซอร์) -->
+    <!-- Preconnect & DNS Prefetch เพื่อเร่งความเร็วในการเชื่อมต่อเครือข่าย -->
+    <link rel="preconnect" href="https://script.google.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://img2.pic.in.th">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://unpkg.com">
+
+    <!-- Favicon -->
     <link rel="icon" href="https://img2.pic.in.th/logob0b7643db577ceee.png" type="image/png">
     
-    <!-- นำเข้า Tailwind CSS -->
+    <!-- Scripts & Styles -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- นำเข้า Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- นำเข้าฟอนต์ Sarabun -->
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        body {
-            font-family: 'Sarabun', sans-serif;
-        }
-        .hidden {
-            display: none !important;
-        }
-        .line-clamp-2 {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;  
-            overflow: hidden;
-        }
-        .line-clamp-3 {
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;  
-            overflow: hidden;
-        }
+        body { font-family: 'Sarabun', sans-serif; }
+        .hidden { display: none !important; }
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     </style>
 </head>
 <body class="min-h-screen bg-gray-50 flex flex-col">
 
     <!-- Header Section -->
     <header class="bg-gradient-to-r from-red-800 via-red-600 to-red-700 shadow-lg relative overflow-hidden">
-        <!-- Background Decoration -->
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-yellow-400 opacity-20 blur-3xl"></div>
         <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-red-900 opacity-30 blur-3xl"></div>
 
@@ -54,6 +43,7 @@
                             src="https://img2.pic.in.th/logob0b7643db577ceee.png" 
                             alt="WMK Portal Logo" 
                             class="w-20 h-20 object-contain rounded-xl"
+                            loading="eager"
                             onerror="this.onerror=null;this.src='https://via.placeholder.com/80?text=WMK';"
                         />
                     </div>
@@ -77,6 +67,7 @@
                         id="search-input"
                         class="w-full md:w-80 pl-10 pr-4 py-3 rounded-full border-none shadow-inner bg-white/10 backdrop-blur-md text-white placeholder-red-200 focus:bg-white focus:text-gray-800 focus:ring-4 focus:ring-yellow-400/50 transition-all duration-300 outline-none"
                         placeholder="ค้นหาแอปพลิเคชัน..."
+                        autocomplete="off"
                     />
                 </div>
             </div>
@@ -99,7 +90,7 @@
                 <h3 class="text-red-800 font-semibold text-lg">เกิดข้อผิดพลาด</h3>
                 <p id="error-message" class="text-red-600 mt-1 leading-relaxed">ไม่สามารถเชื่อมต่อข้อมูลได้ กรุณาลองใหม่อีกครั้ง</p>
                 <button 
-                    onclick="window.initSystem()"
+                    onclick="window.initSystem(true)"
                     class="mt-3 px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm font-medium transition-colors"
                 >
                     ลองใหม่อีกครั้ง
@@ -115,22 +106,18 @@
                     <i data-lucide="layout-grid" class="w-5 h-5 text-red-600"></i>
                     <h2 class="text-xl font-bold">เลือกหมวดหมู่</h2>
                 </div>
-                <div id="category-container" class="flex flex-wrap gap-2 md:gap-3">
-                    <!-- ปุ่มหมวดหมู่จะถูกสร้างที่นี่โดย JS -->
-                </div>
+                <div id="category-container" class="flex flex-wrap gap-2 md:gap-3"></div>
             </div>
 
             <!-- Empty State for Search -->
             <div id="empty-state" class="hidden text-center py-20 bg-white rounded-3xl shadow-sm border border-gray-100">
-                <img src="https://illustrations.popsy.co/amber/falling.svg" alt="Not found" class="w-48 mx-auto opacity-50 mb-4" />
+                <img src="https://illustrations.popsy.co/amber/falling.svg" alt="Not found" class="w-48 mx-auto opacity-50 mb-4" loading="lazy" />
                 <h3 class="text-xl font-bold text-gray-800 mb-2">ไม่พบแอปพลิเคชัน</h3>
                 <p class="text-gray-500">ลองค้นหาด้วยคำอื่น หรือเลือกหมวดหมู่ใหม่</p>
             </div>
 
             <!-- Apps Grid -->
-            <div id="app-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                <!-- การ์ดแอปพลิเคชันจะถูกสร้างที่นี่โดย JS -->
-            </div>
+            <div id="app-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
         </div>
     </main>
 
@@ -147,24 +134,15 @@
 
     <!-- Application Logic -->
     <script>
-        function initIcons() {
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            } else {
-                setTimeout(initIcons, 50);
-            }
-        }
-
-        initIcons();
-        document.getElementById('footer-year').innerText = `© ${new Date().getFullYear()} WMK Portal. All rights reserved.`;
-
-        // ตัวแปรข้อมูล
         const API_URL = 'https://script.google.com/macros/s/AKfycbzfsKPZkki8RCDe9jrtIM_rv42uVxijZrdOvNncYR_n-apJsK4Do53Uc9LIq2K3PRrpBA/exec';
+        const LOCAL_CACHE_KEY = 'wmk_portal_cache_data';
+        
         let allApps = [];
         let categories = ['ทั้งหมด'];
         let activeCategory = 'ทั้งหมด';
         let searchQuery = '';
         let pageViews = 0;
+        let searchTimeout = null;
 
         // DOM Elements
         const loadingState = document.getElementById('loading-state');
@@ -177,244 +155,17 @@
         const searchInput = document.getElementById('search-input');
         const pageViewsCount = document.getElementById('page-views-count');
 
-        window.initSystem = initSystem;
-
-        async function initSystem() {
-            showLoading();
-            await fetchSheetData();
-            renderCategories();
-            renderApps();
-            showContent();
-            
-            trackPageView();
-        }
-
-        async function fetchSheetData() {
-            try {
-                const response = await fetch(API_URL + '?_t=' + new Date().getTime(), {
-                    method: 'GET',
-                    redirect: 'follow',
-                    headers: { 'Accept': 'application/json' }
-                });
-                
-                if (!response.ok) throw new Error('Network response was not ok');
-                
-                const data = await response.json();
-                
-                pageViews = data.pageViews || 0;
-                pageViewsCount.innerText = pageViews.toLocaleString();
-
-                const appData = data.data || [];
-                allApps = appData.filter(app => app['ชื่อแอป'] && app['Link']);
-                
-                const uniqueCategories = [...new Set(allApps.map(app => app['หมวดหมู่']).filter(Boolean))];
-                categories = ['ทั้งหมด', ...uniqueCategories];
-                
-            } catch (err) {
-                console.error('Error fetching data:', err);
-                
-                if (err.name === 'TypeError' && err.message.includes('fetch')) {
-                    showError('ไม่สามารถดึงข้อมูลได้ (ถูกบล็อกจากระบบความปลอดภัย CORS)<br><br><b>วิธีแก้ไข:</b> โปรดกลับไปที่หน้า Google Apps Script ของคุณ -> กด <b>การทำให้ใช้งานได้ (Deploy)</b> -> เลือก <b>การทำให้ใช้งานได้รายการใหม่ (New deployment)</b> -> ตรง <b>ผู้มีสิทธิ์เข้าถึง (Who has access)</b> ให้เลือกเป็น <b>"ทุกคน" (Anyone)</b> แล้วนำลิงก์ใหม่มาอัปเดตครับ');
-                } else {
-                    showError('ไม่สามารถเชื่อมต่อข้อมูลจากตารางได้ กรุณาลองใหม่อีกครั้ง<br><small>' + err.message + '</small>');
-                }
-            }
-        }
-
-        function trackPageView() {
-            const hasVisited = sessionStorage.getItem('wmk_visited');
-            if (!hasVisited) {
-                const trackUrl = API_URL + '?action=view&_t=' + new Date().getTime();
-                
-                fetch(trackUrl)
-                .then(() => {
-                    sessionStorage.setItem('wmk_visited', 'true');
-                    pageViews += 1;
-                    pageViewsCount.innerText = pageViews.toLocaleString();
-                })
-                .catch(e => {
-                    // แผนสำรองถ้า fetch โดนบล็อก
-                    new Image().src = trackUrl;
-                    sessionStorage.setItem('wmk_visited', 'true');
-                });
-            }
-        }
-
-        window.trackClick = function(appName) {
-            // 1. เพิ่มตัวเลขในหน้าเว็บทันที
-            const appIndex = allApps.findIndex(a => a['ชื่อแอป'] === appName);
-            if(appIndex !== -1) {
-               let currentClicks = parseInt(allApps[appIndex]['คลิก']) || 0;
-               allApps[appIndex]['คลิก'] = currentClicks + 1;
-               renderApps(); 
-            }
-            
-            // 2. ส่งข้อมูลไป Google Sheet
-            const trackUrl = API_URL + '?action=click&appName=' + encodeURIComponent(appName) + '&_t=' + new Date().getTime();
-            
-            // ใช้ fetch ปกติเพื่อให้เห็น Error จริง
-            fetch(trackUrl)
-                .then(res => res.json())
-                .then(data => console.log('บันทึกการคลิกแล้ว:', data))
-                .catch(e => {
-                    console.warn("Fetch ถูกบล็อก กำลังใช้แผนสำรอง (Image Beacon)...");
-                    // 3. แผนสำรอง: สร้างรูปภาพล่องหนเพื่อส่ง Request (วิธีนี้เบราว์เซอร์จะไม่บล็อกแม้หน้าต่างจะถูกเปิดไปแล้ว)
-                    const beacon = new Image();
-                    beacon.src = trackUrl;
-                });
-        };
-
-        // ฟังก์ชันช่วยกำหนดสีตามหมวดหมู่ (แก้ไขให้ข้อความมีสีที่แตกต่างกัน)
-        function getCategoryColors(categoryName) {
-            const name = categoryName ? categoryName.replace(/,/g, '').trim() : ''; // ตัดเครื่องหมายจุลภาคเผื่อพิมพ์ผิด
-            
-            // ฝ่ายบริหารงานวิชาการ (สีฟ้า)
-            if (name.includes('วิชาการ')) return { 
-                badgeBg: 'bg-blue-100', badgeText: 'text-blue-800', 
-                btnActive: 'bg-blue-600 text-white border-blue-600 shadow-md transform scale-105', 
-                btnInactive: 'bg-white text-blue-700 border-gray-200 hover:border-blue-400 hover:bg-blue-50' 
-            };
-            // ฝ่ายบริหารงานทั่วไป (สีม่วง)
-            if (name.includes('ทั่วไป') && name.includes('บริหาร')) return { 
-                badgeBg: 'bg-purple-100', badgeText: 'text-purple-800', 
-                btnActive: 'bg-purple-600 text-white border-purple-600 shadow-md transform scale-105', 
-                btnInactive: 'bg-white text-purple-700 border-gray-200 hover:border-purple-400 hover:bg-purple-50' 
-            };
-            // ฝ่ายบริหารงานบุคคล (สีชมพู/แดงอมม่วง)
-            if (name.includes('บุคคล')) return { 
-                badgeBg: 'bg-pink-100', badgeText: 'text-pink-800', 
-                btnActive: 'bg-pink-600 text-white border-pink-600 shadow-md transform scale-105', 
-                btnInactive: 'bg-white text-pink-700 border-gray-200 hover:border-pink-400 hover:bg-pink-50' 
-            };
-            // ฝ่ายบริหารงานแผนและงบประมาณ (สีเขียว)
-            if (name.includes('แผน') || name.includes('งบประมาณ')) return { 
-                badgeBg: 'bg-emerald-100', badgeText: 'text-emerald-800', 
-                btnActive: 'bg-emerald-600 text-white border-emerald-600 shadow-md transform scale-105', 
-                btnInactive: 'bg-white text-emerald-700 border-gray-200 hover:border-emerald-400 hover:bg-emerald-50' 
-            };
-            // การใช้งานทั่วไป (สีเทาฟ้า)
-            if (name === 'การใช้งานทั่วไป') return { 
-                badgeBg: 'bg-slate-100', badgeText: 'text-slate-800', 
-                btnActive: 'bg-slate-600 text-white border-slate-600 shadow-md transform scale-105', 
-                btnInactive: 'bg-white text-slate-700 border-gray-200 hover:border-slate-400 hover:bg-slate-50' 
-            };
-            
-            // สีเริ่มต้น (สำหรับหมวดหมู่อื่นๆ หรือ "ทั้งหมด")
-            return { 
-                badgeBg: 'bg-yellow-100', badgeText: 'text-yellow-800', 
-                btnActive: 'bg-red-600 text-white border-red-600 shadow-md transform scale-105', 
-                btnInactive: 'bg-white text-gray-700 border-gray-200 hover:border-yellow-400 hover:bg-yellow-50 hover:text-red-700' 
-            };
-        }
-
-        function renderCategories() {
-            categoryContainer.innerHTML = '';
-            categories.forEach(category => {
-                const btn = document.createElement('button');
-                btn.textContent = category || 'ไม่มีหมวดหมู่';
-                
-                const colors = getCategoryColors(category);
-                const baseClasses = "px-5 py-2.5 rounded-full text-sm md:text-base font-semibold transition-all duration-300 shadow-sm border";
-                
-                // นำสีมาใช้กับปุ่ม
-                btn.className = `${baseClasses} ${activeCategory === category ? colors.btnActive : colors.btnInactive}`;
-                
-                btn.onclick = () => {
-                    activeCategory = category;
-                    renderCategories();
-                    renderApps();
-                };
-                
-                categoryContainer.appendChild(btn);
-            });
-        }
-
-        function renderApps() {
-            const filteredApps = allApps.filter(app => {
-                const matchCategory = activeCategory === 'ทั้งหมด' || app['หมวดหมู่'] === activeCategory;
-                const searchLower = searchQuery.toLowerCase();
-                const matchSearch = (app['ชื่อแอป']?.toLowerCase().includes(searchLower)) || 
-                                    (app['คำอธิบาย']?.toLowerCase().includes(searchLower));
-                return matchCategory && matchSearch;
-            }).sort((a, b) => {
-                const clicksA = parseInt(a['คลิก']) || 0;
-                const clicksB = parseInt(b['คลิก']) || 0;
-                return clicksB - clicksA;
-            });
-
-            appContainer.innerHTML = '';
-
-            if (filteredApps.length === 0) {
-                emptyState.classList.remove('hidden');
+        function initIcons() {
+            if (window.lucide) {
+                window.lucide.createIcons();
             } else {
-                emptyState.classList.add('hidden');
-                
-                filteredApps.forEach(app => {
-                    const clickCount = parseInt(app['คลิก']) || 0;
-                    const safeAppName = app['ชื่อแอป'].replace(/"/g, '&quot;').replace(/'/g, "\\'");
-                    
-                    // ดึงชุดสีตามหมวดหมู่
-                    const colors = getCategoryColors(app['หมวดหมู่']);
-
-                    const categoryBadge = app['หมวดหมู่'] 
-                        ? `<div class="mb-3">
-                               <span class="px-3 py-1 ${colors.badgeBg} ${colors.badgeText} text-xs font-semibold rounded-full inline-block shadow-sm">
-                                   ${app['หมวดหมู่']}
-                               </span>
-                           </div>` 
-                        : '';
-
-                    // สร้างส่วนแสดงรูปภาพ (หากมีข้อมูลในคอลัมน์ pic) ขยายขนาดให้ใหญ่ขึ้นตามที่กำหนด
-                    const imageHTML = app['pic'] 
-                        ? `<div class="w-[120px] h-[120px] sm:w-[120px] sm:h-[120px] flex-shrink-0 rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-gray-50 flex items-center justify-center">
-                               <img src="${app['pic']}" alt="${app['ชื่อแอป']}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onerror="this.style.display='none'">
-                           </div>` 
-                        : '';
-
-                    const cardHTML = `
-                        <a href="${app['Link']}" target="_blank" rel="noopener noreferrer" 
-                           onclick="window.trackClick('${safeAppName}')"
-                           class="group flex flex-col bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 overflow-hidden">
-                            <div class="h-2 w-full bg-gradient-to-r from-yellow-400 to-red-500"></div>
-                            
-                            <div class="p-6 flex-grow flex flex-col">
-                                <div class="flex justify-between items-start gap-4 mb-3">
-                                    <div class="flex-1 min-w-0">
-                                        ${categoryBadge}
-                                        <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2 group-hover:text-red-600 transition-colors leading-tight">
-                                            ${app['ชื่อแอป'] || 'ไม่ระบุชื่อ'}
-                                        </h3>
-                                    </div>
-                                    ${imageHTML}
-                                </div>
-                                
-                                <p class="text-sm text-gray-500 mb-6 flex-grow line-clamp-3 leading-relaxed">
-                                    ${app['คำอธิบาย'] || 'ไม่มีคำอธิบายสำหรับแอปพลิเคชันนี้'}
-                                </p>
-                                
-                                <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between text-gray-400 group-hover:text-red-600 transition-colors">
-                                    <div class="flex items-center gap-1.5 ${clickCount > 0 ? 'text-red-500' : ''}">
-                                        <i data-lucide="heart" class="w-4 h-4 ${clickCount > 0 ? 'fill-current' : ''}"></i>
-                                        <span class="text-sm font-semibold">${clickCount.toLocaleString()}</span>
-                                    </div>
-                                    <i data-lucide="external-link" class="w-5 h-5 transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform text-red-600"></i>
-                                </div>
-                            </div>
-                        </a>
-                    `;
-                    
-                    appContainer.insertAdjacentHTML('beforeend', cardHTML);
-                });
-                
-                initIcons();
+                setTimeout(initIcons, 50);
             }
         }
 
-        searchInput.addEventListener('input', (e) => {
-            searchQuery = e.target.value;
-            renderApps();
-        });
+        document.getElementById('footer-year').innerText = `© ${new Date().getFullYear()} WMK Portal. All rights reserved.`;
 
+        // สลับแสดงผลหน้าจอ
         function showLoading() {
             loadingState.classList.remove('hidden');
             errorState.classList.add('hidden');
@@ -434,7 +185,265 @@
             contentArea.classList.remove('hidden');
         }
 
-        initSystem();
+        // นำเข้าข้อมูลและจัดระเบียบ State
+        function applyData(data) {
+            if (!data) return;
+            if (typeof data.pageViews !== 'undefined') {
+                pageViews = Number(data.pageViews) || 0;
+                pageViewsCount.innerText = pageViews.toLocaleString();
+            }
+
+            const appData = data.data || [];
+            allApps = appData.filter(app => app['ชื่อแอป'] && app['Link']);
+            
+            const uniqueCategories = [...new Set(allApps.map(app => app['หมวดหมู่']).filter(Boolean))];
+            categories = ['ทั้งหมด', ...uniqueCategories];
+
+            renderCategories();
+            renderApps();
+        }
+
+        // เริ่มต้นการทำงาน (Stale-While-Revalidate: โหลดจากเครื่องทันที แล้วอัปเดตเบื้องหลัง)
+        window.initSystem = async function(isForce = false) {
+            let hasLocalData = false;
+            
+            if (!isForce) {
+                try {
+                    const localCached = localStorage.getItem(LOCAL_CACHE_KEY);
+                    if (localCached) {
+                        const parsed = JSON.parse(localCached);
+                        if (parsed && parsed.data && parsed.data.length > 0) {
+                            applyData(parsed);
+                            showContent();
+                            hasLocalData = true;
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Cache read error:', e);
+                }
+            }
+
+            if (!hasLocalData) {
+                showLoading();
+            }
+
+            trackPageView();
+            await fetchSheetData(hasLocalData);
+        };
+
+        // ดึงข้อมูลจากเซิร์ฟเวอร์
+        async function fetchSheetData(silentMode = false) {
+            try {
+                // ตรวจสอบ parameter สำหรับ Admin refresh (?refresh=1)
+                const searchStr = (window.location && window.location.search) ? window.location.search : '';
+                const urlParams = new URLSearchParams(searchStr);
+                const isRefresh = urlParams.get('refresh') === '1' || urlParams.get('nocache') === '1';
+                const fetchUrl = isRefresh ? `${API_URL}?refresh=1&_t=${Date.now()}` : API_URL;
+
+                const response = await fetch(fetchUrl, {
+                    method: 'GET',
+                    redirect: 'follow',
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                
+                if (data.status === 'success' || data.data) {
+                    applyData(data);
+                    showContent();
+                    try {
+                        localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(data));
+                    } catch (_) {}
+                } else if (!silentMode) {
+                    throw new Error(data.message || 'Data structure error');
+                }
+            } catch (err) {
+                console.error('Error fetching data:', err);
+                if (!silentMode) {
+                    if (err.name === 'TypeError' && err.message.includes('fetch')) {
+                        showError('ไม่สามารถดึงข้อมูลได้ (ถูกบล็อกจากระบบความปลอดภัย CORS)<br><br><b>วิธีแก้ไข:</b> โปรดกลับไปที่หน้า Google Apps Script -> กด <b>การทำให้ใช้งานได้ (Deploy)</b> -> เลือก <b>การทำให้ใช้งานได้รายการใหม่ (New deployment)</b> -> ตรง <b>ผู้มีสิทธิ์เข้าถึง (Who has access)</b> ให้เลือกเป็น <b>"ทุกคน" (Anyone)</b> แล้วนำลิงก์ใหม่มาอัปเดตครับ');
+                    } else {
+                        showError('ไม่สามารถเชื่อมต่อข้อมูลจากตารางได้ กรุณาลองใหม่อีกครั้ง<br><small>' + err.message + '</small>');
+                    }
+                }
+            }
+        }
+
+        // นับยอดวิวผู้เข้าชม (PageViews) อย่างมีประสิทธิภาพ ไม่ทำให้เซิร์ฟเวอร์ติดขัด
+        function trackPageView() {
+            if (sessionStorage.getItem('wmk_visited')) return;
+            sessionStorage.setItem('wmk_visited', 'true');
+            
+            pageViews += 1;
+            pageViewsCount.innerText = pageViews.toLocaleString();
+
+            const trackUrl = `${API_URL}?action=view&_t=${Date.now()}`;
+            if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
+                navigator.sendBeacon(trackUrl);
+            } else {
+                fetch(trackUrl, { keepalive: true, mode: 'no-cors' }).catch(() => {
+                    new Image().src = trackUrl;
+                });
+            }
+        }
+
+        // นับยอดคลิก (Optimistic UI: แสดงผลทันที + ส่งข้อมูลเบื้องหลัง)
+        window.trackClick = function(appName) {
+            const app = allApps.find(a => a['ชื่อแอป'] === appName);
+            if (app) {
+                app['คลิก'] = (parseInt(app['คลิก']) || 0) + 1;
+                renderApps();
+            }
+            
+            const trackUrl = `${API_URL}?action=click&appName=${encodeURIComponent(appName)}&_t=${Date.now()}`;
+            if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
+                navigator.sendBeacon(trackUrl);
+            } else {
+                fetch(trackUrl, { keepalive: true, mode: 'no-cors' }).catch(() => {
+                    new Image().src = trackUrl;
+                });
+            }
+        };
+
+        // ชุดสีหมวดหมู่ตามข้อกำหนดเดิม
+        function getCategoryColors(categoryName) {
+            const name = categoryName ? categoryName.replace(/,/g, '').trim() : '';
+            if (name.includes('วิชาการ')) return { 
+                badgeBg: 'bg-blue-100', badgeText: 'text-blue-800', 
+                btnActive: 'bg-blue-600 text-white border-blue-600 shadow-md transform scale-105', 
+                btnInactive: 'bg-white text-blue-700 border-gray-200 hover:border-blue-400 hover:bg-blue-50' 
+            };
+            if (name.includes('ทั่วไป') && name.includes('บริหาร')) return { 
+                badgeBg: 'bg-purple-100', badgeText: 'text-purple-800', 
+                btnActive: 'bg-purple-600 text-white border-purple-600 shadow-md transform scale-105', 
+                btnInactive: 'bg-white text-purple-700 border-gray-200 hover:border-purple-400 hover:bg-purple-50' 
+            };
+            if (name.includes('บุคคล')) return { 
+                badgeBg: 'bg-pink-100', badgeText: 'text-pink-800', 
+                btnActive: 'bg-pink-600 text-white border-pink-600 shadow-md transform scale-105', 
+                btnInactive: 'bg-white text-pink-700 border-gray-200 hover:border-pink-400 hover:bg-pink-50' 
+            };
+            if (name.includes('แผน') || name.includes('งบประมาณ')) return { 
+                badgeBg: 'bg-emerald-100', badgeText: 'text-emerald-800', 
+                btnActive: 'bg-emerald-600 text-white border-emerald-600 shadow-md transform scale-105', 
+                btnInactive: 'bg-white text-emerald-700 border-gray-200 hover:border-emerald-400 hover:bg-emerald-50' 
+            };
+            if (name === 'การใช้งานทั่วไป') return { 
+                badgeBg: 'bg-slate-100', badgeText: 'text-slate-800', 
+                btnActive: 'bg-slate-600 text-white border-slate-600 shadow-md transform scale-105', 
+                btnInactive: 'bg-white text-slate-700 border-gray-200 hover:border-slate-400 hover:bg-slate-50' 
+            };
+            return { 
+                badgeBg: 'bg-yellow-100', badgeText: 'text-yellow-800', 
+                btnActive: 'bg-red-600 text-white border-red-600 shadow-md transform scale-105', 
+                btnInactive: 'bg-white text-gray-700 border-gray-200 hover:border-yellow-400 hover:bg-yellow-50 hover:text-red-700' 
+            };
+        }
+
+        // เรนเดอร์ปุ่มหมวดหมู่
+        function renderCategories() {
+            const html = categories.map(category => {
+                const colors = getCategoryColors(category);
+                const isActive = activeCategory === category;
+                const cls = `px-5 py-2.5 rounded-full text-sm md:text-base font-semibold transition-all duration-300 shadow-sm border ${isActive ? colors.btnActive : colors.btnInactive}`;
+                const safeCat = (category || 'ไม่มีหมวดหมู่').replace(/"/g, '&quot;');
+                return `<button type="button" onclick="selectCategory('${safeCat}')" class="${cls}">${safeCat}</button>`;
+            }).join('');
+            categoryContainer.innerHTML = html;
+        }
+
+        window.selectCategory = function(cat) {
+            activeCategory = cat;
+            renderCategories();
+            renderApps();
+        };
+
+        // เรนเดอร์การ์ดแอปทั้งหมดอย่างมีประสิทธิภาพ (Single Batch DOM Update)
+        function renderApps() {
+            const searchLower = searchQuery.toLowerCase().trim();
+            const filteredApps = allApps.filter(app => {
+                const matchCategory = activeCategory === 'ทั้งหมด' || app['หมวดหมู่'] === activeCategory;
+                const matchSearch = !searchLower || 
+                    (app['ชื่อแอป'] && app['ชื่อแอป'].toLowerCase().includes(searchLower)) || 
+                    (app['คำอธิบาย'] && app['คำอธิบาย'].toLowerCase().includes(searchLower));
+                return matchCategory && matchSearch;
+            }).sort((a, b) => (parseInt(b['คลิก']) || 0) - (parseInt(a['คลิก']) || 0));
+
+            if (filteredApps.length === 0) {
+                appContainer.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            
+            const cardsHtml = filteredApps.map(app => {
+                const clickCount = parseInt(app['คลิก']) || 0;
+                const appTitle = app['ชื่อแอป'] || 'ไม่ระบุชื่อ';
+                const safeAppName = appTitle.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                const colors = getCategoryColors(app['หมวดหมู่']);
+
+                const categoryBadge = app['หมวดหมู่'] 
+                    ? `<div class="mb-3">
+                           <span class="px-3 py-1 ${colors.badgeBg} ${colors.badgeText} text-xs font-semibold rounded-full inline-block shadow-sm">
+                               ${app['หมวดหมู่']}
+                           </span>
+                       </div>` 
+                    : '';
+
+                const imageHTML = app['pic'] 
+                    ? `<div class="w-[120px] h-[120px] flex-shrink-0 rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-gray-50 flex items-center justify-center">
+                           <img src="${app['pic']}" alt="${safeAppName}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" onerror="this.parentElement.style.display='none'">
+                       </div>` 
+                    : '';
+
+                return `
+                    <a href="${app['Link']}" target="_blank" rel="noopener noreferrer" 
+                       onclick="window.trackClick('${safeAppName}')"
+                       class="group flex flex-col bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 overflow-hidden">
+                        <div class="h-2 w-full bg-gradient-to-r from-yellow-400 to-red-500"></div>
+                        <div class="p-6 flex-grow flex flex-col">
+                            <div class="flex justify-between items-start gap-4 mb-3">
+                                <div class="flex-1 min-w-0">
+                                    ${categoryBadge}
+                                    <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2 group-hover:text-red-600 transition-colors leading-tight">
+                                        ${appTitle}
+                                    </h3>
+                                </div>
+                                ${imageHTML}
+                            </div>
+                            <p class="text-sm text-gray-500 mb-6 flex-grow line-clamp-3 leading-relaxed">
+                                ${app['คำอธิบาย'] || 'ไม่มีคำอธิบายสำหรับแอปพลิเคชันนี้'}
+                            </p>
+                            <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between text-gray-400 group-hover:text-red-600 transition-colors">
+                                <div class="flex items-center gap-1.5 ${clickCount > 0 ? 'text-red-500' : ''}">
+                                    <i data-lucide="heart" class="w-4 h-4 ${clickCount > 0 ? 'fill-current' : ''}"></i>
+                                    <span class="text-sm font-semibold">${clickCount.toLocaleString()}</span>
+                                </div>
+                                <i data-lucide="external-link" class="w-5 h-5 transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform text-red-600"></i>
+                            </div>
+                        </div>
+                    </a>
+                `;
+            }).join('');
+
+            appContainer.innerHTML = cardsHtml;
+            initIcons();
+        }
+
+        // หน่วงเวลาการค้นหา (Debounce 100ms) ป้องกันการกระตุกบนมือถือ
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchQuery = e.target.value;
+                renderApps();
+            }, 100);
+        });
+
+        // เริ่มต้นการทำงานทันที
+        initIcons();
+        window.initSystem();
     </script>
 </body>
 </html>
