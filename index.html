@@ -5,11 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WMK Portal - ศูนย์รวมแอปพลิเคชัน โรงเรียนวัดแม่กะ</title>
     
-    <!-- Preconnect & DNS Prefetch เพื่อเร่งความเร็วในการเชื่อมต่อเครือข่าย -->
+    <!-- Preconnect & DNS Prefetch เพื่อเร่งความเร็วเครือข่ายสูงสุด -->
     <link rel="preconnect" href="https://script.google.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://img1.pic.in.th">
     <link rel="preconnect" href="https://img2.pic.in.th">
+    <link rel="preconnect" href="https://lh3.googleusercontent.com">
     <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
     <link rel="dns-prefetch" href="https://unpkg.com">
 
@@ -78,7 +80,7 @@
     <main class="flex-grow container mx-auto px-4 py-8">
         
         <!-- State: Loading -->
-        <div id="loading-state" class="flex flex-col items-center justify-center py-20">
+        <div id="loading-state" class="hidden flex flex-col items-center justify-center py-20">
             <i data-lucide="loader-2" class="w-12 h-12 text-red-600 animate-spin mb-4"></i>
             <p class="text-gray-600 font-medium animate-pulse">กำลังโหลดข้อมูลระบบ...</p>
         </div>
@@ -99,7 +101,7 @@
         </div>
 
         <!-- Content Area -->
-        <div id="content-area" class="hidden">
+        <div id="content-area">
             <!-- Category Filter -->
             <div class="mb-10">
                 <div class="flex items-center gap-2 mb-4 text-gray-800">
@@ -134,6 +136,182 @@
 
     <!-- Application Logic -->
     <script>
+        // ข้อมูลตั้งต้น (Seed Data) เพื่อให้ผู้ใช้ที่เข้าครั้งแรกเปิดหน้าเว็บได้ทันทีใน 0.1 วินาที ไม่ต้องรอ Apps Script
+        const SEED_DATA = {
+            "status": "success",
+            "pageViews": 846,
+            "data": [
+                {
+                    "ชื่อแอป": "ระบบสารสนเทศข้อมูลอาหารกลางวัน",
+                    "หมวดหมู่": "ฝ่ายบริหารงานทั่วไป",
+                    "คำอธิบาย": "แสดงข้อมูลและภาพอาหารกลางวัน ภาพรวมคุณภาพอาหารและภาวะโภชนาการของนักเรียน",
+                    "Link": "https://wmk-food.vercel.app/",
+                    "คลิก": "129",
+                    "pic": "https://img1.pic.in.th/images/ChatGPT-Image-17-..-2569-22_09_14.th.png"
+                },
+                {
+                    "ชื่อแอป": "ระบบแจ้งซ่อม",
+                    "หมวดหมู่": "ฝ่ายบริหารงานทั่วไป",
+                    "คำอธิบาย": "แจ้งซ่อมหรือปรับปรุงอาคารสถานที่ จุดเสี่ยง และสารสนเทศการซ่อมแซมในโรงเรียน",
+                    "Link": "https://wmk-repair.vercel.app/",
+                    "คลิก": "56",
+                    "pic": "https://img2.pic.in.th/ChatGPT-Image-17-..-2569-21_44_49.th.png"
+                },
+                {
+                    "ชื่อแอป": "ระบบปฏิทินกิจกรรม",
+                    "หมวดหมู่": "ฝ่ายบริหารงานแผนและงบประมาณ",
+                    "คำอธิบาย": "ปฏิทินกิจกรรมภายในโรงเรียน การแจ้งเตือนการส่งงาน การเข้าร่วมประชุม/อบรมของครู",
+                    "Link": "https://wmk-cal.vercel.app/",
+                    "คลิก": "162",
+                    "pic": "https://img2.pic.in.th/ChatGPT-Image-17-..-2569-21_59_41.th.png"
+                },
+                {
+                    "ชื่อแอป": "ระบบช่วยเขียนข่าวประชาสัมพันธ์",
+                    "หมวดหมู่": "ฝ่ายบริหารงานทั่วไป",
+                    "คำอธิบาย": "ช่วยสร้าง prompt ในการเขียนข่าวประชาสัมพันธ์และข้อความเป็นทางการลง Facebook",
+                    "Link": "https://wmk-news-1.vercel.app/",
+                    "คลิก": "44",
+                    "pic": "https://img2.pic.in.th/ChatGPT-Image-17-..-2569-22_05_35.th.png"
+                },
+                {
+                    "ชื่อแอป": "ระบบสรุปยอดเงินบริจาคการทำบุญทอดผ้าป่าสามัคคี",
+                    "หมวดหมู่": "ฝ่ายบริหารงานแผนและงบประมาณ",
+                    "คำอธิบาย": "สรุปยอดเงินผ้าป่าสามัคคี รายชื่อผู้บริจาคและสถิติการบริจาครายวัน",
+                    "Link": "https://wmk-donation.vercel.app/",
+                    "คลิก": "18",
+                    "pic": "https://img1.pic.in.th/images/ChatGPT-Image-17-..-2569-22_12_35.th.png"
+                },
+                {
+                    "ชื่อแอป": "ระบบข้อมูลสารสนเทศทะเบียนประวัติข้าราชการ",
+                    "หมวดหมู่": "ฝ่ายบริหารงานบุคคล",
+                    "คำอธิบาย": "สารสนเทศข้อมูลครูในโรงเรียน,ข้อมูลอายุราชการ,วิทยฐานะ,ใบประกอบวิชาชีพ",
+                    "Link": "https://wmk-hr.vercel.app/",
+                    "คลิก": "27",
+                    "pic": "https://img1.pic.in.th/images/ChatGPT-Image-20-..-2569-13_51_27.th.png"
+                },
+                {
+                    "ชื่อแอป": "ระบบสแกน QR Code บนคอมพิวเตอร์",
+                    "หมวดหมู่": "ฝ่ายบริหารงานทั่วไป",
+                    "คำอธิบาย": "สแกน QR Code บนเอกสาร/ภาพ ที่เปิดบนคอมพิวเตอร์",
+                    "Link": "https://wmk-qr.vercel.app/",
+                    "คลิก": "49",
+                    "pic": "https://img1.pic.in.th/images/ChatGPT-Image-17-..-2569-22_23_33.th.png"
+                },
+                {
+                    "ชื่อแอป": "ระบบงานสารบรรณอิเล็กทรอนิกส์",
+                    "หมวดหมู่": "ฝ่ายบริหารงานทั่วไป",
+                    "คำอธิบาย": "ใช้ค้นหาจดหมายราชการและคำสั่งของโรงเรียน",
+                    "Link": "https://wmk-sarabun-ten.vercel.app",
+                    "คลิก": "405",
+                    "pic": "https://img1.pic.in.th/images/ChatGPT-Image-17-..-2569-22_28_02.th.png"
+                },
+                {
+                    "ชื่อแอป": "ระบบค้นหาอัลบั้มภาพกิจกรรม",
+                    "หมวดหมู่": "ฝ่ายบริหารงานทั่วไป",
+                    "คำอธิบาย": "ใช้ค้นหาอัลบั้มภาพกิจกรรมของโรงเรียน",
+                    "Link": "https://wmk-pic.vercel.app/",
+                    "คลิก": "62",
+                    "pic": "https://img2.pic.in.th/ChatGPT-Image-17-..-2569-22_30_02.th.png"
+                },
+                {
+                    "ชื่อแอป": "ระบบตรวจสอบความถูกต้องของหนังสือราชการ ",
+                    "หมวดหมู่": "ฝ่ายบริหารงานทั่วไป",
+                    "คำอธิบาย": "ใช้ตรวจสอบความถูกต้องของหนังสือราชการ รายชื่อคณะครูและคำผิด",
+                    "Link": "https://gemini.google.com/gem/49e030024dc0",
+                    "คลิก": "23",
+                    "pic": "https://img2.pic.in.th/ChatGPT-Image-20-..-2569-13_57_13.th.png"
+                },
+                {
+                    "ชื่อแอป": "ระบบตรวจสอบความถูกต้องของข้อสอบ",
+                    "หมวดหมู่": "ฝ่ายบริหารงานวิชาการ",
+                    "คำอธิบาย": "ใช้ตรวจสอบความถูกต้องของข้อสอบ ความสอดคล้องและคำผิด",
+                    "Link": "https://gemini.google.com/gem/48737f20e864",
+                    "คลิก": "23",
+                    "pic": "https://img2.pic.in.th/ChatGPT-Image-20-..-2569-14_04_26.th.png"
+                },
+                {
+                    "ชื่อแอป": "ระบบข้อมูลสารสนเทศการประเมินผลคุณภาพผู้เรียน",
+                    "หมวดหมู่": "ฝ่ายบริหารงานวิชาการ",
+                    "คำอธิบาย": "แสดงกราฟข้อมูลผลการสอบ RT,NT,O-Net",
+                    "Link": "https://wmk-score.vercel.app/",
+                    "คลิก": "26",
+                    "pic": "https://img1.pic.in.th/images/ChatGPT-Image-20-..-2569-14_15_19.th.png"
+                },
+                {
+                    "ชื่อแอป": "ระบบข้อมูลสารสนเทศนักเรียน",
+                    "หมวดหมู่": "ฝ่ายบริหารงานทั่วไป",
+                    "คำอธิบาย": "กราฟแสดงข้อมูลจำนวน เพศ เชื้อชาติ สัญชาติและข้อมูลอื่นๆของนักเรียน",
+                    "Link": "https://wmkstudent-data.vercel.app/",
+                    "คลิก": "27",
+                    "pic": "https://img2.pic.in.th/ChatGPT-Image-20-..-2569-15_15_57.th.png"
+                },
+                {
+                    "ชื่อแอป": "ระบบสารสนเทศผลงานครูและนักเรียน",
+                    "หมวดหมู่": "ฝ่ายบริหารงานบุคคล",
+                    "คำอธิบาย": "ระบบบันทึกและสรุปผลงานครูและนักเรียน",
+                    "Link": "https://wmk-reward.vercel.app/",
+                    "คลิก": "14",
+                    "pic": "https://img2.pic.in.th/ChatGPT-Image-20-..-2569-22_10_09.th.png"
+                },
+                {
+                    "ชื่อแอป": "ระบบสารสนเทศงบประมาณโครงการประจำปี",
+                    "หมวดหมู่": "ฝ่ายบริหารงานแผนและงบประมาณ",
+                    "คำอธิบาย": "ระบบบันทึกและตรวจสอบการใช้เงินโครงการ ยอดเงินโครงการที่เหลือ",
+                    "Link": "https://wmk-money.vercel.app/",
+                    "คลิก": "12",
+                    "pic": "https://img1.pic.in.th/images/ChatGPT-Image-20-..-2569-22_21_01.th.png"
+                },
+                {
+                    "ชื่อแอป": "ระบบสแกนใบหน้าเช็คชื่อนักเรียน",
+                    "หมวดหมู่": "ฝ่ายบริหารงานทั่วไป",
+                    "คำอธิบาย": "ระบบสแกนใบหน้าเพื่อบันทึกการมาเรียน พร้อมกราฟสรุปและไฟล์ CSV",
+                    "Link": "https://wmk-face.vercel.app/",
+                    "คลิก": "170",
+                    "pic": "https://img1.pic.in.th/images/ChatGPT-Image-22-..-2569-20_47_14.th.png"
+                },
+                {
+                    "ชื่อแอป": "ระบบวัดความสูงและมาตราส่วน",
+                    "หมวดหมู่": "ฝ่ายบริหารงานวิชาการ",
+                    "คำอธิบาย": "ระบบ AR วัดความสูงต้นไม้และคำนวณมาตรส่วนในการวาดภาพ",
+                    "Link": "https://wmk-scale.vercel.app/",
+                    "คลิก": "66",
+                    "pic": "https://img2.pic.in.th/ChatGPT-Image-23-..-2569-16_57_24.th.png"
+                },
+                {
+                    "ชื่อแอป": "ระบบนิเทศการสอน",
+                    "หมวดหมู่": "ฝ่ายบริหารงานวิชาการ",
+                    "คำอธิบาย": "ระบบบันทึกข้อมูลการนิเทศการสอน การลงนามของผู้บริหารและโหลดไฟล์นิเทศในรูปแบบ pdf รวมทั้งสารสนเทศการนิเทศ",
+                    "Link": "https://wmk-teaching.vercel.app/",
+                    "คลิก": "70",
+                    "pic": "https://img2.pic.in.th/ChatGPT-Image-5-..-2569-14_58_38.th.png"
+                },
+                {
+                    "ชื่อแอป": "ระบบฝากไฟล์ภาพ (สำหรับทำเว็บแอฟ)",
+                    "หมวดหมู่": "ฝ่ายบริหารงานทั่วไป",
+                    "คำอธิบาย": "ระบบฝากไฟล์ภาพ (สำหรับทำเว็บแอฟ)",
+                    "Link": "https://wmk-pic2.vercel.app/",
+                    "คลิก": "33",
+                    "pic": "https://lh3.googleusercontent.com/d/13WHoELRogY-DX0VpbS51B9RxnmavoUi_"
+                },
+                {
+                    "ชื่อแอป": "ระบบข้อมูลการดำเนินงานลูกเสือ โรงเรียนวัดแม่กะ",
+                    "หมวดหมู่": "ฝ่ายบริหารงานทั่วไป",
+                    "คำอธิบาย": "ข้อมูลสารสนเทศการดำเนินงานลูกเสือ โรงเรียนวัดแม่กะ",
+                    "Link": "https://wmk-scout.vercel.app/",
+                    "คลิก": "61",
+                    "pic": "https://lh3.googleusercontent.com/d/1mq0IFSxDcar2WJ3_4rysMe--K_rWvlnQ"
+                },
+                {
+                    "ชื่อแอป": "ระบบบันทึกการเฝ้าระวังความปลอดภัยในสถานศึกษาผ่านกล้อง CCTV",
+                    "หมวดหมู่": "ฝ่ายบริหารงานทั่วไป",
+                    "คำอธิบาย": "ระบบบันทึกการรายงานข้อมูลความปลอดภัยในสถานศึกษาผ่านกล้อง CCTV ",
+                    "Link": "https://script.google.com/macros/s/AKfycbyXswNcA3PDPYf3No5pr9pRBEcZlhhTzgkLTPcGkG5566wHSYKGHyvgnR-xzmW1HN-dnw/exec",
+                    "คลิก": "71",
+                    "pic": "https://lh3.googleusercontent.com/d/1o28Vuy5iwSjzy-IwjF6tG_2fXqoXNJcz"
+                }
+            ]
+        };
+
         const API_URL = 'https://script.google.com/macros/s/AKfycbzfsKPZkki8RCDe9jrtIM_rv42uVxijZrdOvNncYR_n-apJsK4Do53Uc9LIq2K3PRrpBA/exec';
         const LOCAL_CACHE_KEY = 'wmk_portal_cache_data';
         
@@ -165,7 +343,6 @@
 
         document.getElementById('footer-year').innerText = `© ${new Date().getFullYear()} WMK Portal. All rights reserved.`;
 
-        // สลับแสดงผลหน้าจอ
         function showLoading() {
             loadingState.classList.remove('hidden');
             errorState.classList.add('hidden');
@@ -203,38 +380,43 @@
             renderApps();
         }
 
-        // เริ่มต้นการทำงาน (Stale-While-Revalidate: โหลดจากเครื่องทันที แล้วอัปเดตเบื้องหลัง)
+        // เริ่มต้นการทำงาน (เรนเดอร์ทันทีจากแคชหรือ Seed Data ในเสี้ยววินาที)
         window.initSystem = async function(isForce = false) {
-            let hasLocalData = false;
-            
+            let initialData = null;
+
             if (!isForce) {
                 try {
                     const localCached = localStorage.getItem(LOCAL_CACHE_KEY);
                     if (localCached) {
                         const parsed = JSON.parse(localCached);
                         if (parsed && parsed.data && parsed.data.length > 0) {
-                            applyData(parsed);
-                            showContent();
-                            hasLocalData = true;
+                            initialData = parsed;
                         }
                     }
                 } catch (e) {
                     console.warn('Cache read error:', e);
                 }
+
+                // หากยังไม่มีข้อมูลในแคช (เข้าครั้งแรก) ให้ใช้ SEED_DATA ทันที
+                if (!initialData && typeof SEED_DATA !== 'undefined') {
+                    initialData = SEED_DATA;
+                }
             }
 
-            if (!hasLocalData) {
+            if (initialData) {
+                applyData(initialData);
+                showContent();
+            } else {
                 showLoading();
             }
 
             trackPageView();
-            await fetchSheetData(hasLocalData);
+            await fetchSheetData(Boolean(initialData));
         };
 
-        // ดึงข้อมูลจากเซิร์ฟเวอร์
+        // ดึงข้อมูลล่าสุดจากเซิร์ฟเวอร์แบบเงียบๆ (Silent Background Sync)
         async function fetchSheetData(silentMode = false) {
             try {
-                // ตรวจสอบ parameter สำหรับ Admin refresh (?refresh=1)
                 const searchStr = (window.location && window.location.search) ? window.location.search : '';
                 const urlParams = new URLSearchParams(searchStr);
                 const isRefresh = urlParams.get('refresh') === '1' || urlParams.get('nocache') === '1';
@@ -270,7 +452,7 @@
             }
         }
 
-        // นับยอดวิวผู้เข้าชม (PageViews) อย่างมีประสิทธิภาพ ไม่ทำให้เซิร์ฟเวอร์ติดขัด
+        // นับยอดวิวผู้เข้าชม (PageViews)
         function trackPageView() {
             if (sessionStorage.getItem('wmk_visited')) return;
             sessionStorage.setItem('wmk_visited', 'true');
@@ -359,7 +541,7 @@
             renderApps();
         };
 
-        // เรนเดอร์การ์ดแอปทั้งหมดอย่างมีประสิทธิภาพ (Single Batch DOM Update)
+        // เรนเดอร์การ์ดแอปทั้งหมด (มี Skeleton Loader + Fade-in สำหรับรูปภาพ)
         function renderApps() {
             const searchLower = searchQuery.toLowerCase().trim();
             const filteredApps = allApps.filter(app => {
@@ -392,9 +574,15 @@
                        </div>` 
                     : '';
 
+                // โครงร่างโหลดรูปภาพ (Skeleton Loader) พร้อม Fade-in นุ่มนวล
                 const imageHTML = app['pic'] 
-                    ? `<div class="w-[120px] h-[120px] flex-shrink-0 rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-gray-50 flex items-center justify-center">
-                           <img src="${app['pic']}" alt="${safeAppName}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" onerror="this.parentElement.style.display='none'">
+                    ? `<div class="relative w-[120px] h-[120px] flex-shrink-0 rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-gray-100 flex items-center justify-center">
+                           <div class="absolute inset-0 bg-gray-200 animate-pulse"></div>
+                           <img src="${app['pic']}" alt="${safeAppName}" 
+                                class="w-full h-full object-cover relative z-10 transition-opacity duration-300 opacity-0 group-hover:scale-110" 
+                                loading="lazy" 
+                                onload="this.classList.remove('opacity-0'); if(this.previousElementSibling) this.previousElementSibling.style.display='none';" 
+                                onerror="this.parentElement.style.display='none'">
                        </div>` 
                     : '';
 
@@ -432,7 +620,7 @@
             initIcons();
         }
 
-        // หน่วงเวลาการค้นหา (Debounce 100ms) ป้องกันการกระตุกบนมือถือ
+        // หน่วงเวลาการค้นหา (Debounce 100ms)
         searchInput.addEventListener('input', (e) => {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
